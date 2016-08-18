@@ -6,7 +6,7 @@
 //  Copyright © 2015年 谭真. All rights reserved.
 //  version 1.5.0
 
-/*
+/*cx
  经过测试，比起xib的方式，把TZAssetCell改用纯代码的方式来写，滑动帧数明显提高了（约提高10帧左右）
  
  最初发现这个问题并修复的是@小鱼周凌宇同学，她的博客地址: http://zhoulingyu.com/

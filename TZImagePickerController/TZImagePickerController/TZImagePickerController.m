@@ -1,4 +1,4 @@
-//
+//！
 //  TZImagePickerController.m
 //  TZImagePickerController
 //
@@ -34,6 +34,7 @@
 
 @implementation TZImagePickerController
 
+///设置导航栏显示 确定按钮颜色
 - (void)viewDidLoad {
     [super viewDidLoad];
     self.view.backgroundColor = [UIColor whiteColor];
@@ -53,6 +54,8 @@
     }
 }
 
+
+///调用appearance的方法setTitleTextAttributes
 - (void)setBarItemTextFont:(UIFont *)barItemTextFont {
     _barItemTextFont = barItemTextFont;
     [self configBarButtonItemAppearance];
@@ -79,6 +82,7 @@
     [barItem setTitleTextAttributes:textAttrs forState:UIControlStateNormal];
 }
 
+///保存状态栏风格设置状态栏风格
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     _originStatusBarStyle = [UIApplication sharedApplication].statusBarStyle;
@@ -88,16 +92,20 @@
 #pragma clang diagnostic pop
 }
 
+///设回旧的状态栏风格
 - (void)viewWillDisappear:(BOOL)animated {
     [super viewWillDisappear:animated];
     [UIApplication sharedApplication].statusBarStyle = _originStatusBarStyle;
     [self hideProgressHUD];
 }
 
+///便利构造器
 - (instancetype)initWithMaxImagesCount:(NSInteger)maxImagesCount delegate:(id<TZImagePickerControllerDelegate>)delegate {
     return [self initWithMaxImagesCount:maxImagesCount columnNumber:4 delegate:delegate];
 }
 
+///1.实例化TZAlbumPickerController作为rootVC
+///2.获取权限 然后push图片选择控制器
 - (instancetype)initWithMaxImagesCount:(NSInteger)maxImagesCount columnNumber:(NSInteger)columnNumber delegate:(id<TZImagePickerControllerDelegate>)delegate {
     TZAlbumPickerController *albumPickerVc = [[TZAlbumPickerController alloc] init];
     albumPickerVc.columnNumber = columnNumber;
@@ -178,6 +186,7 @@
     return self;
 }
 
+///初始化按钮的图片名称
 - (void)configDefaultImageName {
     self.takePictureImageName = @"takePicture.png";
     self.photoSelImageName = @"photo_sel_photoPickerVc.png";
@@ -188,6 +197,7 @@
     self.photoOriginSelImageName = @"photo_original_sel.png";
 }
 
+///每隔0.2秒监听一次相册权限
 - (void)observeAuthrizationStatusChange {
     if ([[TZImageManager manager] authorizationStatusAuthorized]) {
         [self pushToPhotoPickerVc];
@@ -198,6 +208,7 @@
     }
 }
 
+///获取相册图片 然后push到TZPhotoPickerController
 - (void)pushToPhotoPickerVc {
     _pushToPhotoPickerVc = YES;
     if (_pushToPhotoPickerVc) {
@@ -212,6 +223,7 @@
     }
 }
 
+///显示一个alert
 - (void)showAlertWithTitle:(NSString *)title {
     if (iOS8Later) {
         UIAlertController *alertController = [UIAlertController alertControllerWithTitle:title message:nil preferredStyle:UIAlertControllerStyleAlert];
@@ -224,7 +236,7 @@
 #pragma clang diagnostic pop
     }
 }
-
+//~
 - (void)showProgressHUD {
     if (!_progressHUD) {
         _progressHUD = [UIButton buttonWithType:UIButtonTypeCustom];
@@ -259,7 +271,7 @@
         [self hideProgressHUD];
     });
 }
-
+//~
 - (void)hideProgressHUD {
     if (_progressHUD) {
         [_HUDIndicatorView stopAnimating];
@@ -267,6 +279,7 @@
     }
 }
 
+///5<=timeout<=60
 - (void)setTimeout:(NSInteger)timeout {
     _timeout = timeout;
     if (timeout < 5) {
@@ -276,6 +289,7 @@
     }
 }
 
+///2<=columnNumber<=6
 - (void)setColumnNumber:(NSInteger)columnNumber {
     _columnNumber = columnNumber;
     if (columnNumber <= 2) {
@@ -289,6 +303,7 @@
     [TZImageManager manager].columnNumber = _columnNumber;
 }
 
+///[500,800]
 - (void)setPhotoPreviewMaxWidth:(CGFloat)photoPreviewMaxWidth {
     _photoPreviewMaxWidth = photoPreviewMaxWidth;
     if (photoPreviewMaxWidth > 800) {
@@ -299,6 +314,7 @@
     [TZImageManager manager].photoPreviewMaxWidth = _photoPreviewMaxWidth;
 }
 
+///_selectedModels _selectedAssets
 - (void)setSelectedAssets:(NSMutableArray *)selectedAssets {
     _selectedAssets = selectedAssets;
     _selectedModels = [NSMutableArray array];
@@ -323,11 +339,13 @@
     [[NSUserDefaults standardUserDefaults] synchronize];
 }
 
+///排序方式
 - (void)setSortAscendingByModificationDate:(BOOL)sortAscendingByModificationDate {
     _sortAscendingByModificationDate = sortAscendingByModificationDate;
     [TZImageManager manager].sortAscendingByModificationDate = sortAscendingByModificationDate;
 }
 
+///打开设置
 - (void)settingBtnClick {
     if (iOS8Later) {
         [[UIApplication sharedApplication] openURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString]];
@@ -336,6 +354,7 @@
     }
 }
 
+///override
 - (void)pushViewController:(UIViewController *)viewController animated:(BOOL)animated {
     if (iOS7Later) viewController.automaticallyAdjustsScrollViewInsets = NO;
     if (_timer) { [_timer invalidate]; _timer = nil;}
@@ -421,7 +440,7 @@
 }
 
 #pragma mark - Click Event
-
+//delegate和cancel Block都会执行
 - (void)cancel {
     TZImagePickerController *imagePickerVc = (TZImagePickerController *)self.navigationController;
     if (imagePickerVc.autoDismiss) {
@@ -467,7 +486,7 @@
 
 
 @implementation UIImage (MyBundle)
-
+///从TZImagePickerController.bundle取图片
 + (UIImage *)imageNamedFromMyBundle:(NSString *)name {
     UIImage *image = [UIImage imageNamed:[@"TZImagePickerController.bundle" stringByAppendingPathComponent:name]];
     if (image) {

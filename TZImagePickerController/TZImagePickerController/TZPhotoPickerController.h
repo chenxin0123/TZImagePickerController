@@ -9,11 +9,14 @@
 #import <UIKit/UIKit.h>
 
 @class TZAlbumModel;
+/**
+ *  选择图片
+ */
 @interface TZPhotoPickerController : UIViewController
 
 @property (nonatomic, assign) BOOL isFirstAppear;
 @property (nonatomic, assign) NSInteger columnNumber;
-@property (nonatomic, strong) TZAlbumModel *model;
+@property (nonatomic, strong) TZAlbumModel *model;///相册
 
 @property (nonatomic, copy) void (^backButtonClickHandle)(TZAlbumModel *model);
 

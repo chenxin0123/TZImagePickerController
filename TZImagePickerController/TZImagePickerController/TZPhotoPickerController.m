@@ -38,6 +38,7 @@ static CGSize AssetGridThumbnailSize;
 
 @implementation TZPhotoPickerController
 
+//拍照的视图控制器
 - (UIImagePickerController *)imagePickerVc {
     if (_imagePickerVc == nil) {
         _imagePickerVc = [[UIImagePickerController alloc] init];
@@ -244,7 +245,7 @@ static CGSize AssetGridThumbnailSize;
 }
 
 #pragma mark - Click Event
-
+///调用代理方法以及执行block
 - (void)cancel {
     TZImagePickerController *imagePickerVc = (TZImagePickerController *)self.navigationController;
     if (imagePickerVc.autoDismiss) {
@@ -258,11 +259,13 @@ static CGSize AssetGridThumbnailSize;
     }
 }
 
+///预览
 - (void)previewButtonClick {
     TZPhotoPreviewController *photoPreviewVc = [[TZPhotoPreviewController alloc] init];
     [self pushPhotoPrevireViewController:photoPreviewVc];
 }
 
+///原图按钮
 - (void)originalPhotoButtonClick {
     _originalPhotoButton.selected = !_originalPhotoButton.isSelected;
     _isSelectOriginalPhoto = _originalPhotoButton.isSelected;
@@ -270,9 +273,11 @@ static CGSize AssetGridThumbnailSize;
     if (_isSelectOriginalPhoto) [self getSelectedPhotoBytes];
 }
 
+///确定按钮 CXMARK
 - (void)okButtonClick {
     TZImagePickerController *tzImagePickerVc = (TZImagePickerController *)self.navigationController;
     [tzImagePickerVc showProgressHUD];
+    ///数组初始化
     NSMutableArray *photos = [NSMutableArray array];
     NSMutableArray *assets = [NSMutableArray array];
     NSMutableArray *infoArr = [NSMutableArray array];
@@ -292,6 +297,7 @@ static CGSize AssetGridThumbnailSize;
 
             for (id item in photos) { if ([item isKindOfClass:[NSNumber class]]) return; }
             
+            //所有都处理完毕 调用代理方法以及block
             if ([tzImagePickerVc.pickerDelegate respondsToSelector:@selector(imagePickerController:didFinishPickingPhotos:sourceAssets:isSelectOriginalPhoto:)]) {
                 [tzImagePickerVc.pickerDelegate imagePickerController:tzImagePickerVc didFinishPickingPhotos:photos sourceAssets:assets isSelectOriginalPhoto:_isSelectOriginalPhoto];
             }
@@ -476,6 +482,7 @@ static CGSize AssetGridThumbnailSize;
     [self.navigationController pushViewController:photoPreviewVc animated:YES];
 }
 
+///更新图片数据大小的label
 - (void)getSelectedPhotoBytes {
     TZImagePickerController *imagePickerVc = (TZImagePickerController *)self.navigationController;
     [[TZImageManager manager] getPhotosBytesWithArray:imagePickerVc.selectedModels completion:^(NSString *totalBytes) {

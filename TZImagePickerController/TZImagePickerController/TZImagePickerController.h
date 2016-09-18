@@ -1,4 +1,4 @@
-//
+//！
 //  TZImagePickerController.h
 //  TZImagePickerController
 //
@@ -73,7 +73,7 @@
 /// The photos user have selected
 /// 用户选中过的图片数组
 @property (nonatomic, strong) NSMutableArray *selectedAssets;
-@property (nonatomic, strong) NSMutableArray<TZAssetModel *> *selectedModels;
+@property (nonatomic, strong) NSMutableArray<TZAssetModel *> *selectedModels;///TZAssetModel
 
 - (void)showAlertWithTitle:(NSString *)title;
 - (void)showProgressHUD;

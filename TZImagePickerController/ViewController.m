@@ -1,4 +1,4 @@
-//
+//！
 //  ViewController.m
 //  TZImagePickerController
 //
@@ -38,7 +38,7 @@
 @end
 
 @implementation ViewController
-
+//getter
 - (UIImagePickerController *)imagePickerVc {
     if (_imagePickerVc == nil) {
         _imagePickerVc = [[UIImagePickerController alloc] init];
@@ -96,11 +96,12 @@
 }
 
 #pragma mark UICollectionView
-
+//多一个添加按钮
 - (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section {
     return _selectedPhotos.count + 1;
 }
 
+//最后一个cell显示添加按钮
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath {
     TZTestCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"TZTestCell" forIndexPath:indexPath];
     cell.videoImageView.hidden = YES;
@@ -117,8 +118,10 @@
     return cell;
 }
 
+
+//选择了照片 或者 点击了添加按钮 CXMARK
 - (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
-    if (indexPath.row == _selectedPhotos.count) {
+    if (indexPath.row == _selectedPhotos.count) {//添加按钮
         BOOL showSheet = self.showSheetSwitch.isOn;
         if (showSheet) {
 #pragma clang diagnostic push
@@ -231,7 +234,7 @@
 }
 
 #pragma mark - UIImagePickerController
-
+//显示UIImagePickerController以及权限获取的处理
 - (void)takePhoto {
     AVAuthorizationStatus authStatus = [AVCaptureDevice authorizationStatusForMediaType:AVMediaTypeVideo];
     if ((authStatus == AVAuthorizationStatusRestricted || authStatus == AVAuthorizationStatusDenied) && iOS7Later) {
@@ -255,6 +258,8 @@
     }
 }
 
+//实例化一个TZImagePickerController来处理图片..
+//先保存到相册 在取相机胶卷相册 取到第一张图就是刚刚拍摄的图片 放入_selectedAssets
 - (void)imagePickerController:(UIImagePickerController*)picker didFinishPickingMediaWithInfo:(NSDictionary *)info {
     [picker dismissViewControllerAnimated:YES completion:nil];
     NSString *type = [info objectForKey:UIImagePickerControllerMediaType];
@@ -272,6 +277,8 @@
                 alert.tag = 1;
                 [alert show];
             } else {
+                //保存图片到相册成功
+                //找到相机胶卷相册 然后生成新的图片数组
                 [[TZImageManager manager] getCameraRollAlbum:NO allowPickingImage:YES completion:^(TZAlbumModel *model) {
                     [[TZImageManager manager] getAssetsFromFetchResult:model.result allowPickingVideo:NO allowPickingImage:YES completion:^(NSArray<TZAssetModel *> *models) {
                         [tzImagePickerVc hideProgressHUD];
@@ -289,6 +296,7 @@
     }
 }
 
+//dismiss
 - (void)imagePickerControllerDidCancel:(UIImagePickerController *)picker {
     if ([picker isKindOfClass:[UIImagePickerController class]]) {
         [picker dismissViewControllerAnimated:YES completion:nil];
@@ -351,6 +359,11 @@
     // _collectionView.contentSize = CGSizeMake(0, ((_selectedPhotos.count + 2) / 3 ) * (_margin + _itemWH));
 }
 
+
+- (void)imagePickerController:(TZImagePickerController *)picker didFinishPickingPhotos:(NSArray<UIImage *> *)photos sourceAssets:(NSArray *)assets isSelectOriginalPhoto:(BOOL)isSelectOriginalPhoto infos:(NSArray<NSDictionary *> *)infos {
+    NSLog(@"%@",infos);
+}
+
 // If user picking a video, this callback will be called.
 // If system version > iOS8,asset is kind of PHAsset class, else is ALAsset class.
 // 如果用户选择了一个视频，下面的handle会被执行
@@ -371,6 +384,7 @@
 
 #pragma mark Click Event
 
+//根据sender的tag值删除照片
 - (void)deleteBtnClik:(UIButton *)sender {
     [_selectedPhotos removeObjectAtIndex:sender.tag];
     [_selectedAssets removeObjectAtIndex:sender.tag];

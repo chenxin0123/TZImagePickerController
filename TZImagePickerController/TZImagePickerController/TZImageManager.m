@@ -24,6 +24,7 @@ static CGSize AssetGridThumbnailSize;
 static CGFloat TZScreenWidth;
 static CGFloat TZScreenScale;
 
+///SINGLETON
 + (instancetype)manager {
     static TZImageManager *manager;
     static dispatch_once_t onceToken;
@@ -74,7 +75,7 @@ static CGFloat TZScreenScale;
 
 #pragma mark - Get Album
 
-/// Get Album 获得相册/相册数组
+/// Get Album 获取相机胶卷相册
 - (void)getCameraRollAlbum:(BOOL)allowPickingVideo allowPickingImage:(BOOL)allowPickingImage completion:(void (^)(TZAlbumModel *))completion{
     __block TZAlbumModel *model;
     if (iOS8Later) {
@@ -83,8 +84,10 @@ static CGFloat TZScreenScale;
         if (!allowPickingImage) option.predicate = [NSPredicate predicateWithFormat:@"mediaType == %ld",
                                                     PHAssetMediaTypeVideo];
         // option.sortDescriptors = @[[NSSortDescriptor sortDescriptorWithKey:@"creationDate" ascending:self.sortAscendingByModificationDate]];
+        //遍历所有smart相册
         option.sortDescriptors = @[[NSSortDescriptor sortDescriptorWithKey:@"modificationDate" ascending:self.sortAscendingByModificationDate]];
         PHFetchResult *smartAlbums = [PHAssetCollection fetchAssetCollectionsWithType:PHAssetCollectionTypeSmartAlbum subtype:PHAssetCollectionSubtypeAlbumRegular options:nil];
+        //Panoramas Videos Recently Deleted Recently Added Favorites Camera Roll
         for (PHAssetCollection *collection in smartAlbums) {
             // 有可能是PHCollectionList类的的对象，过滤掉
             if (![collection isKindOfClass:[PHAssetCollection class]]) return;
@@ -95,7 +98,7 @@ static CGFloat TZScreenScale;
                 break;
             }
         }
-    } else {
+    } else {//遍历所有组
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
         [self.assetLibrary enumerateGroupsWithTypes:ALAssetsGroupAll usingBlock:^(ALAssetsGroup *group, BOOL *stop) {
@@ -111,6 +114,7 @@ static CGFloat TZScreenScale;
     }
 }
 
+///获取所有相册 包括用户创建的相册 相机胶卷置顶
 - (void)getAllAlbums:(BOOL)allowPickingVideo allowPickingImage:(BOOL)allowPickingImage completion:(void (^)(NSArray<TZAlbumModel *> *))completion{
     NSMutableArray *albumArr = [NSMutableArray array];
     if (iOS8Later) {
@@ -121,9 +125,11 @@ static CGFloat TZScreenScale;
         // option.sortDescriptors = @[[NSSortDescriptor sortDescriptorWithKey:@"creationDate" ascending:self.sortAscendingByModificationDate]];
         option.sortDescriptors = @[[NSSortDescriptor sortDescriptorWithKey:@"modificationDate" ascending:self.sortAscendingByModificationDate]];
         PHFetchResult *smartAlbums = [PHAssetCollection fetchAssetCollectionsWithType:PHAssetCollectionTypeSmartAlbum subtype:PHAssetCollectionSubtypeAlbumRegular options:nil];
+        //用户创建的相册
         PHFetchResult *topLevelUserCollections = [PHCollectionList fetchTopLevelUserCollectionsWithOptions:nil];
         
         for (PHAssetCollection *collection in smartAlbums) {
+            NSLog(@"%@",collection.localizedTitle);
             // 有可能是PHCollectionList类的的对象，过滤掉
             if (![collection isKindOfClass:[PHAssetCollection class]]) return;
             PHFetchResult *fetchResult = [PHAsset fetchAssetsInAssetCollection:collection options:option];
@@ -135,7 +141,9 @@ static CGFloat TZScreenScale;
                 [albumArr addObject:[self modelWithResult:fetchResult name:collection.localizedTitle]];
             }
         }
+        NSLog(@"---------------");
         for (PHAssetCollection *collection in topLevelUserCollections) {
+            NSLog(@"%@",collection.localizedTitle);
             // 有可能是PHCollectionList类的的对象，过滤掉
             if (![collection isKindOfClass:[PHAssetCollection class]]) return;
             PHFetchResult *fetchResult = [PHAsset fetchAssetsInAssetCollection:collection options:option];
@@ -173,7 +181,7 @@ static CGFloat TZScreenScale;
 
 #pragma mark - Get Assets
 
-/// Get Assets 获得照片数组
+/// Get Assets 获得照片/视频数组 生成TZAssetModel数组
 - (void)getAssetsFromFetchResult:(id)result allowPickingVideo:(BOOL)allowPickingVideo allowPickingImage:(BOOL)allowPickingImage completion:(void (^)(NSArray<TZAssetModel *> *))completion {
     NSMutableArray *photoArr = [NSMutableArray array];
     if ([result isKindOfClass:[PHFetchResult class]]) {
@@ -327,6 +335,7 @@ static CGFloat TZScreenScale;
     }
 }
 
+//格式化时长
 - (NSString *)getNewTimeFromDurationSecond:(NSInteger)duration {
     NSString *newTime;
     if (duration < 10) {
@@ -346,6 +355,8 @@ static CGFloat TZScreenScale;
 }
 
 /// Get photo bytes 获得一组照片的大小
+/// photos TZAssetModel
+/// 获取数组中的图片数据大小 
 - (void)getPhotosBytesWithArray:(NSArray *)photos completion:(void (^)(NSString *totalBytes))completion {
     __block NSInteger dataLength = 0;
     __block NSInteger assetCount = 0;
@@ -374,6 +385,7 @@ static CGFloat TZScreenScale;
     }
 }
 
+///获取图片总大小的字符串表示
 - (NSString *)getBytesFromDataLength:(NSInteger)dataLength {
     NSString *bytes;
     if (dataLength >= 0.1 * (1024 * 1024)) {
@@ -396,7 +408,7 @@ static CGFloat TZScreenScale;
     }
     return [self getPhotoWithAsset:asset photoWidth:fullScreenWidth completion:completion];
 }
-
+///获取照片 然后调用completion
 - (PHImageRequestID)getPhotoWithAsset:(id)asset photoWidth:(CGFloat)photoWidth completion:(void (^)(UIImage *, NSDictionary *, BOOL isDegraded))completion {
     if ([asset isKindOfClass:[PHAsset class]]) {
         CGSize imageSize;
@@ -420,6 +432,7 @@ static CGFloat TZScreenScale;
                 if (completion) completion(result,info,[[info objectForKey:PHImageResultIsDegradedKey] boolValue]);
             }
             // Download image from iCloud / 从iCloud下载图片
+            
             if ([info objectForKey:PHImageResultIsInCloudKey] && !result) {
                 PHImageRequestOptions *option = [[PHImageRequestOptions alloc]init];
                 option.networkAccessAllowed = YES;
@@ -551,7 +564,7 @@ static CGFloat TZScreenScale;
 }
 
 #pragma mark - Save photo
-
+///保存图片到相册
 - (void)savePhotoWithImage:(UIImage *)image completion:(void (^)(NSError *error))completion {
     NSData *data = UIImageJPEGRepresentation(image, 0.9);
     if (iOS9Later) { // 这里有坑... iOS8系统下这个方法保存图片会失败
@@ -714,6 +727,7 @@ static CGFloat TZScreenScale;
     }
 }
 
+//...
 - (BOOL)isCameraRollAlbum:(NSString *)albumName {
     NSString *versionStr = [[UIDevice currentDevice].systemVersion stringByReplacingOccurrencesOfString:@"." withString:@""];
     if (versionStr.length <= 1) {
@@ -730,6 +744,7 @@ static CGFloat TZScreenScale;
     }
 }
 
+//返回资产id
 - (NSString *)getAssetIdentifier:(id)asset {
     if (iOS8Later) {
         PHAsset *phAsset = (PHAsset *)asset;
@@ -745,7 +760,7 @@ static CGFloat TZScreenScale;
 }
 
 #pragma mark - Private Method
-
+///返回TZAlbumModel实例 result：PHFetchResult|ALAssetsGroup
 - (TZAlbumModel *)modelWithResult:(id)result name:(NSString *)name{
     TZAlbumModel *model = [[TZAlbumModel alloc] init];
     model.result = result;
@@ -782,6 +797,7 @@ static CGFloat TZScreenScale;
     return orientation;
 }
 
+///调整图片方向
 - (UIImage *)fixOrientation:(UIImage *)aImage {
     if (!self.shouldFixOrientation) return aImage;
     

@@ -273,7 +273,7 @@ static CGSize AssetGridThumbnailSize;
     if (_isSelectOriginalPhoto) [self getSelectedPhotoBytes];
 }
 
-///确定按钮 CXMARK
+///确定按钮 处理代理方法以及block的调用 获取图片数组 图片信息数据 资产数组
 - (void)okButtonClick {
     TZImagePickerController *tzImagePickerVc = (TZImagePickerController *)self.navigationController;
     [tzImagePickerVc showProgressHUD];
@@ -451,6 +451,7 @@ static CGSize AssetGridThumbnailSize;
     }
 }
 
+///刷新底栏的显示
 - (void)refreshBottomToolBarStatus {
     TZImagePickerController *imagePickerVc = (TZImagePickerController *)self.navigationController;
     
@@ -467,6 +468,7 @@ static CGSize AssetGridThumbnailSize;
     if (_isSelectOriginalPhoto) [self getSelectedPhotoBytes];
 }
 
+///显示预览控制器
 - (void)pushPhotoPrevireViewController:(TZPhotoPreviewController *)photoPreviewVc {
     __weak typeof(self) weakSelf = self;
     photoPreviewVc.isSelectOriginalPhoto = _isSelectOriginalPhoto;
@@ -502,6 +504,7 @@ static CGSize AssetGridThumbnailSize;
     return newImage;
 }
 
+//滑动到底部
 - (void)scrollCollectionViewToBottom {
     TZImagePickerController *tzImagePickerVc = (TZImagePickerController *)self.navigationController;
     if (_shouldScrollToBottom && _models.count > 0 && tzImagePickerVc.sortAscendingByModificationDate) {
@@ -548,6 +551,7 @@ static CGSize AssetGridThumbnailSize;
 
 #pragma mark - UIImagePickerControllerDelegate
 
+//选完图片先保存
 - (void)imagePickerController:(UIImagePickerController*)picker didFinishPickingMediaWithInfo:(NSDictionary *)info {
     [picker dismissViewControllerAnimated:YES completion:nil];
     NSString *type = [info objectForKey:UIImagePickerControllerMediaType];

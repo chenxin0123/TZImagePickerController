@@ -1,4 +1,4 @@
-//
+//!
 //  TZImageManager.m
 //  TZImagePickerController
 //
@@ -408,7 +408,7 @@ static CGFloat TZScreenScale;
     }
     return [self getPhotoWithAsset:asset photoWidth:fullScreenWidth completion:completion];
 }
-///获取照片 然后调用completion
+///获取照片 然后调用completion 跟原图并没有什么关系。。。
 - (PHImageRequestID)getPhotoWithAsset:(id)asset photoWidth:(CGFloat)photoWidth completion:(void (^)(UIImage *, NSDictionary *, BOOL isDegraded))completion {
     if ([asset isKindOfClass:[PHAsset class]]) {
         CGSize imageSize;
